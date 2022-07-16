@@ -17,4 +17,4 @@ run2 : day03-2
 	./day03-2
 
 clean :
-	rm -f day03 result.txt copyResult.txt *.o
+	rm -f day03-1 day03-2 result.txt copyResult.txt *.o
