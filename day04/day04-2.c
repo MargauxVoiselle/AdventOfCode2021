@@ -11,6 +11,9 @@ int boards[NUMBER_BOARDS][BOARD_SIZE][BOARD_SIZE] = {0};
 #define LENGTH 1000
 int draw[LENGTH] = {0};
 
+// tableau qui contiendra les grilles ayant déjà gagné
+int won[LENGTH] = {0};
+
 // récupère le tirage et les différentes grilles du bingo
 void parse()
 {
@@ -110,31 +113,48 @@ int winOrNot(int index)
     return 0;
 }
 
+// renvoie 1 (true) si le tableau a déjà gagné, 0 sinon
+int alreadyWin(int index, int length)
+{
+    for (int i = 0 ; i < length ; i++)
+    {
+        if (won[i] == index)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int main()
 {
     parse();
-    int winner = 0, i = 0, numBoard, lastNumber = 0, sumUnmarked = 0;
+    int winnersCount = 0, i = 0, numBoard, lastNumber = 0, sumUnmarked = 0;
     // tant qu'on a pas trouvé un tableau gagnant
-    while (!(winner))
+    while (winnersCount < NUMBER_BOARDS)
     {
         numBoard = 0;
         // pour toutes les grilles
         while (numBoard < NUMBER_BOARDS)
         {
             mark(numBoard, draw[i]); // on marque le numéro tiré sur la grille
-            // si on a trouvé le tableau gagnant
+            // si on a trouvé un tableau gagnant
             if (winOrNot(numBoard))
             {
-                lastNumber = draw[i]; // on repère le dernier numéro tiré
-                sumUnmarked = unmarkedSum(numBoard); // on fait la somme des numéros non marqués
-                printf("La grille gagnante est la %dème\n", numBoard + 1);
-                numBoard = NUMBER_BOARDS; // permet de sortir de la première boucle
-                winner = 1; // permet de sortir de la seconde boucle
+                // si le gagnant n'a pas déjà été comptabilisé
+                if (!(alreadyWin(numBoard, winnersCount)))
+                {
+                    won[winnersCount] = numBoard; // on rajoute le tableau aux tableaux gagnants
+                    winnersCount++; // on incrémente le nombre de gagnants
+                    lastNumber = draw[i]; // on repère le dernier numéro tiré
+                    sumUnmarked = unmarkedSum(numBoard); // on fait la somme des numéros non marqués
+                }
             }
             numBoard++;
         }
         i++;
     }
+    printf("La dernière grille gagnante est la %dème\n", numBoard);
     printf("Le dernier numéro tiré est le %d\n", lastNumber);
     printf("La somme des numéros non marqués est %d\n", sumUnmarked);
     printf("Le produit vaut alors %d", lastNumber * sumUnmarked);
